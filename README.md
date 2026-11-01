@@ -23,7 +23,7 @@ import "twilit";
 Or with no install, from a CDN (pin a release tag so it never changes under you):
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/apreezofficial/twilit@v0.1.0/src/twilit.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/apreezofficial/twilit@v0.2.0/src/twilit.js"></script>
 ```
 
 Or copy `src/twilit.js` into your project. It has no dependencies.

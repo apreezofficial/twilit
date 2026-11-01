@@ -1,6 +1,6 @@
 {
   "name": "twilit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tiny, dependency-free web component that compares two UIs (light vs dark, before vs after) with a draggable split.",
   "type": "module",
   "main": "src/twilit.js",

@@ -71,6 +71,10 @@
   .readout { font: 500 .8rem var(--mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .readout b { color: var(--ink); font-weight: 500; }
   .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .opts { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 6px; }
+  .opts .pill { height: 32px; padding: 0 14px; background: transparent; color: var(--ink-soft); border: 1px solid var(--line); }
+  .opts .pill:hover { color: var(--ink); background: #ffffff10; }
+  .opts .pill[aria-pressed="true"] { background: var(--ink); color: #000; border-color: var(--ink); }
   .btns .pill { height: 34px; padding: 0 14px; background: var(--pill); color: var(--ink); }
   .btns .pill:hover { background: #333; }
   /* the two UIs being compared */
@@ -129,7 +133,7 @@
 
 <dialog id="dlg" aria-label="Twilit demo">
   <div class="sheet">
-    <twilit-compare id="hero" position="50" label="Light and dark theme comparison">
+    <twilit-compare id="hero" position="50" light-label="Light" dark-label="Dark" label="Light and dark theme comparison">
       <div slot="light" class="app l">
         <div class="top"><h2>Inbox</h2><span class="pill">3 new</span></div>
         <div class="msg"><div class="av">MK</div><div><b>Mara Keane</b><span>Lunch moved to 1:30</span></div></div>
@@ -145,6 +149,12 @@
         <div class="cta">New message</div>
       </div>
     </twilit-compare>
+    <div class="opts" role="group" aria-label="Options">
+      <button type="button" class="pill opt" data-attr="orientation" data-on="vertical" aria-pressed="false">From top</button>
+      <button type="button" class="pill opt" data-attr="autoplay" data-on="" aria-pressed="false">Automatic</button>
+      <button type="button" class="pill opt" data-attr="trigger" data-on="hover" aria-pressed="false">Follow cursor</button>
+      <button type="button" class="pill opt" data-attr="handle" data-on="hidden" aria-pressed="false">Hide handle</button>
+    </div>
     <div class="bar">
       <div class="readout">position <b id="pos">50</b>% · change events <b id="count">0</b></div>
       <div class="btns">
@@ -193,6 +203,16 @@ const animateTo = (to, ms = 700) => {
   raf = requestAnimationFrame(step);
 };
 document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => animateTo(Number(b.dataset.go))));
+
+/* option toggles map straight onto the component's attributes */
+document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+  const on = b.getAttribute("aria-pressed") !== "true";
+  b.setAttribute("aria-pressed", on);
+  if (on) hero.setAttribute(b.dataset.attr, b.dataset.on);
+  else hero.removeAttribute(b.dataset.attr);
+}));
+/* autoplay moves the divider without firing change, so keep the readout in step */
+setInterval(() => { if (dlg.open) show(); }, 100);
 
 const open = () => { if (!dlg.open) dlg.showModal(); };
 document.getElementById("open").addEventListener("click", open);

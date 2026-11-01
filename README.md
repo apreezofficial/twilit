@@ -41,10 +41,26 @@ The `light` slot shows left of the divider and the `dark` slot shows right of it
 
 ### Attributes and properties
 
-| Name | Type | Default | Description |
+| Name | Values | Default | Description |
 | --- | --- | --- | --- |
-| `position` | number 0–100 | `50` | Divider position, as a percentage from the left. Also a JS property. |
-| `label` | string | `Light and dark comparison` | Accessible name for the handle. |
+| `position` | 0–100 | `50` | Divider position, as a percentage. Also a JS property. |
+| `orientation` | `horizontal`, `vertical` | `horizontal` | `vertical` reveals from the top: light above, dark below. |
+| `autoplay` | boolean | off | Sweeps back and forth on its own. Pauses while hovered, focused or dragged, and while offscreen. Ignored under `prefers-reduced-motion`. |
+| `duration` | ms | `4000` | Time for one full autoplay cycle. |
+| `trigger` | `drag`, `hover` | `drag` | `hover` makes the divider follow the mouse with no click. Touch still drags. |
+| `handle` | `hidden` | shown | Removes the round handle and leaves just the divider. |
+| `light-label`, `dark-label` | text | none | Small corner chips naming each side. |
+| `label` | text | `Light and dark comparison` | Accessible name for the handle. |
+
+```html
+<twilit-compare orientation="vertical" autoplay duration="5000"
+                light-label="Before" dark-label="After">
+  <img slot="light" src="before.jpg" alt="">
+  <img slot="dark" src="after.jpg" alt="">
+</twilit-compare>
+```
+
+Methods: `play()` and `pause()` toggle autoplay from code.
 
 ### Events
 
@@ -52,7 +68,7 @@ The `light` slot shows left of the divider and the `dark` slot shows right of it
 
 ### Keyboard
 
-Focus the handle, then use `←`/`→` (or `↓`/`↑`) to move by 2, hold `Shift` for 10, `Home` and `End` for the edges.
+Focus the handle, then use the arrow keys to move by 2 (hold `Shift` for 10), `Home` and `End` for the edges. In vertical mode `↑`/`↓` move the divider.
 
 ### Styling
 
@@ -64,7 +80,7 @@ Focus the handle, then use `←`/`→` (or `↓`/`↑`) to move by 2, hold `Shif
 | `--twilit-handle-bg` / `--twilit-handle-fg` | `#fff` / `#111` |
 | `--twilit-radius` | `16px` |
 
-Shadow parts: `divider`, `handle`.
+Shadow parts: `divider`, `handle`, `chip`. Extra variables: `--twilit-chip-bg`, `--twilit-chip-fg`.
 
 ## Demo
 
@@ -76,8 +92,8 @@ npx serve .
 
 ## Roadmap
 
-- Vertical orientation
-- Optional autoplay "peek" animation
+- Click-to-jump with easing
+- Angled (diagonal) split
 - Framework wrappers if there is demand
 
 ## License

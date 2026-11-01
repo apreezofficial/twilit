@@ -5,10 +5,35 @@
   "type": "module",
   "main": "src/twilit.js",
   "module": "src/twilit.js",
-  "exports": { ".": "./src/twilit.js" },
-  "files": ["src"],
+  "exports": {
+    ".": "./src/twilit.js"
+  },
+  "files": [
+    "src"
+  ],
   "sideEffects": true,
-  "keywords": ["web-component", "comparison-slider", "before-after", "dark-mode", "theme", "slider"],
+  "keywords": [
+    "web-component",
+    "comparison-slider",
+    "before-after",
+    "dark-mode",
+    "theme",
+    "slider"
+  ],
   "license": "MIT",
-  "scripts": { "dev": "npx serve ." }
+  "scripts": {
+    "dev": "npx serve ."
+  },
+  "author": "apreezofficial",
+  "homepage": "https://github.com/apreezofficial/twilit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apreezofficial/twilit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/apreezofficial/twilit/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

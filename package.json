@@ -1,0 +1,14 @@
+{
+  "name": "twilit",
+  "version": "0.1.0",
+  "description": "A tiny, dependency-free web component that compares two UIs (light vs dark, before vs after) with a draggable split.",
+  "type": "module",
+  "main": "src/twilit.js",
+  "module": "src/twilit.js",
+  "exports": { ".": "./src/twilit.js" },
+  "files": ["src"],
+  "sideEffects": true,
+  "keywords": ["web-component", "comparison-slider", "before-after", "dark-mode", "theme", "slider"],
+  "license": "MIT",
+  "scripts": { "dev": "npx serve ." }
+}

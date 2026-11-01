@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Twilit demo</title>
+  <style>
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: radial-gradient(120% 90% at 20% 0%, #ff9a5a 0%, #7a3b8f 40%, #101636 80%);
+      display: grid; place-items: center; padding: 32px 16px; box-sizing: border-box; min-height: 100vh;
+      color: #fff;
+    }
+    main { width: min(560px, 100%); }
+    h1 { font-size: 1.4rem; margin: 0 0 4px; }
+    p.sub { margin: 0 0 20px; opacity: .8; }
+    twilit-compare { height: 340px; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+    .ui { height: 100%; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
+    .ui h2 { margin: 0; font-size: 1.1rem; }
+    .row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; }
+    .dot { width: 32px; height: 32px; border-radius: 50%; background: #5b7cff; flex: none; }
+    .row b { display: block; font-size: .95rem; }
+    .row span { font-size: .8rem; opacity: .65; }
+    .btn { margin-top: auto; text-align: center; padding: 12px; border-radius: 12px; font-weight: 600; background: #5b7cff; color: #fff; }
+    .light { background: #f6f6f8; color: #15161a; }
+    .light .row { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .dark { background: #14151a; color: #f1f1f4; }
+    .dark .row { background: #1f2027; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Twilit</h1>
+    <p class="sub">Drag anywhere, or focus the handle and use the arrow keys.</p>
+    <twilit-compare position="50" label="Light and dark theme comparison">
+      <div slot="light" class="ui light">
+        <h2>Dawn</h2>
+        <div class="row"><div class="dot"></div><div><b>Morning run</b><span>6:30 · 20 push-ups</span></div></div>
+        <div class="row"><div class="dot"></div><div><b>Stretch</b><span>7:00 · 2 min</span></div></div>
+        <div class="btn">Start workout</div>
+      </div>
+      <div slot="dark" class="ui dark">
+        <h2>Night</h2>
+        <div class="row"><div class="dot"></div><div><b>Morning run</b><span>6:30 · 20 push-ups</span></div></div>
+        <div class="row"><div class="dot"></div><div><b>Stretch</b><span>7:00 · 2 min</span></div></div>
+        <div class="btn">Start workout</div>
+      </div>
+    </twilit-compare>
+  </main>
+  <script type="module" src="../src/twilit.js"></script>
+</body>
+</html>

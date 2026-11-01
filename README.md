@@ -10,19 +10,23 @@ A tiny, dependency-free web component that compares two UIs with a draggable spl
 
 ## Install
 
+From GitHub:
+
 ```bash
-npm install twilit
+npm install github:apreezofficial/twilit
 ```
 
 ```js
 import "twilit";
 ```
 
-Or straight from a module script:
+Or with no install, from a CDN (pin a release tag so it never changes under you):
 
 ```html
-<script type="module" src="https://unpkg.com/twilit"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/apreezofficial/twilit@v0.1.0/src/twilit.js"></script>
 ```
+
+Or copy `src/twilit.js` into your project. It has no dependencies.
 
 ## Use
 

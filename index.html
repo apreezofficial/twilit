@@ -52,7 +52,8 @@
     display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; border-radius: 999px;
     font: 500 .85rem var(--sans); border: 0; cursor: pointer;
   }
-  .pill.copy { background: var(--pill); color: var(--ink); }
+  .pill.copy { background: var(--pill); color: var(--ink); max-width: 100%; min-width: 0; }
+  .pill.copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pill.copy:hover { background: #333; }
   .pill.copy svg { width: 15px; height: 15px; opacity: .6; }
   .pill.go { background: var(--ink); color: #000; }
@@ -123,7 +124,7 @@
   <h1>Two sides of every screen</h1>
   <p class="sub">A tiny web component that puts two versions of an interface in one frame and lets people drag between them. No dependencies. Works anywhere.</p>
   <div class="row">
-    <button class="pill copy" id="copy" type="button" aria-label="Copy install command"><span id="copytext">npm install twilit</span>
+    <button class="pill copy" id="copy" type="button" aria-label="Copy install command"><span id="copytext">npm i github:apreezofficial/twilit</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button>
     <button class="pill go" id="open" type="button">Try it out <kbd>T</kbd></button>
   </div>
@@ -224,9 +225,9 @@ addEventListener("keydown", (e) => {
 
 const copyBtn = document.getElementById("copy"), copyText = document.getElementById("copytext");
 copyBtn.addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText("npm install twilit"); copyText.textContent = "Copied"; }
+  try { await navigator.clipboard.writeText("npm i github:apreezofficial/twilit"); copyText.textContent = "Copied"; }
   catch { const r = document.createRange(); r.selectNodeContents(copyText); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); copyText.textContent = "Press Ctrl/Cmd+C"; }
-  setTimeout(() => { copyText.textContent = "npm install twilit"; }, 1600);
+  setTimeout(() => { copyText.textContent = "npm i github:apreezofficial/twilit"; }, 1600);
 });
 </script>
 </body>

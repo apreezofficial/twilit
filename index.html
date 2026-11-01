@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Twilit: a tiny, dependency-free web component that compares two UIs with a draggable split.">
+<title>Twilit</title>
+<style>
+  /* Layout: one black screen. Tiny centered nav, a split-disc hero object, italic serif headline, two pills. Try-it opens the full comparison. */
+  :root {
+    --ground: #000000;
+    --ink: #fafafa;
+    --ink-soft: #ffffff80;
+    --pill: #262626;
+    --line: #ffffff1f;
+    --pearl: #efe9df;
+    --serif: "Instrument Serif", Georgia, serif;
+    --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--sans);
+    padding-block: 28px 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid; grid-template-rows: auto 1fr auto; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  nav { display: flex; justify-content: center; align-items: baseline; gap: 28px; font-size: .85rem; }
+  nav .mark { font: italic 1.25rem var(--serif); }
+  nav a:hover { color: var(--ink-soft); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 999px; }
+
+  .hero { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 22px; padding-block: 24px; min-height: 0; }
+  .orb { width: clamp(150px, 26vh, 210px); aspect-ratio: 1; position: relative; }
+  .orb::before { content: ""; position: absolute; inset: -30%; background: radial-gradient(closest-side, #ffffff1c, transparent); pointer-events: none; }
+  .orb twilit-compare { width: 100%; height: 100%; --twilit-radius: 50%; --twilit-handle-size: 30px; --twilit-divider-width: 1px; --twilit-divider-color: #ffffffcc; border: 1px solid var(--line); box-shadow: 0 0 60px #ffffff14; }
+  .face { height: 100%; display: grid; place-items: center; }
+  .face.l { background: radial-gradient(circle at 30% 25%, #fff, var(--pearl) 60%, #cfc6b6); }
+  .face.d { background: radial-gradient(circle at 70% 75%, #1d1d2b, #07070b 65%); }
+  .face svg { width: 34%; height: 34%; }
+  .face.l svg { transform: translateX(-32%); color: #1a1a1a; }
+  .face.d svg { transform: translateX(32%); color: #f2f2f6; }
+
+  h1 { margin: 0; font: italic 400 clamp(2.4rem, 7.5vw, 3.6rem)/1.05 var(--serif); letter-spacing: -.01em; text-wrap: balance; max-width: 14ch; }
+  .sub { margin: 0; max-width: 52ch; color: var(--ink-soft); font-size: 1rem; text-wrap: balance; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; border-radius: 999px;
+    font: 500 .85rem var(--sans); border: 0; cursor: pointer;
+  }
+  .pill.copy { background: var(--pill); color: var(--ink); }
+  .pill.copy:hover { background: #333; }
+  .pill.copy svg { width: 15px; height: 15px; opacity: .6; }
+  .pill.go { background: var(--ink); color: #000; }
+  .pill.go:hover { background: #fff; }
+  kbd { font: 500 .7rem var(--mono); color: #00000070; }
+
+  footer { text-align: center; font-size: .78rem; color: var(--ink-soft); }
+  footer a:hover { color: var(--ink); }
+
+  /* try-it overlay */
+  dialog { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(760px, calc(100vw - 24px)); max-width: none; max-height: none; overflow: visible; }
+  dialog::backdrop { background: #000000d9; backdrop-filter: blur(6px); }
+  .sheet { background: #0a0a0a; border: 1px solid var(--line); border-radius: 22px; padding: 14px; display: grid; gap: 14px; }
+  .sheet twilit-compare { height: min(420px, 62vh); --twilit-radius: 14px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; padding: 0 6px 4px; }
+  .readout { font: 500 .8rem var(--mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .readout b { color: var(--ink); font-weight: 500; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btns .pill { height: 34px; padding: 0 14px; background: var(--pill); color: var(--ink); }
+  .btns .pill:hover { background: #333; }
+  /* the two UIs being compared */
+  .app { height: 100%; padding: 22px; display: flex; flex-direction: column; gap: 12px; font-family: var(--body); }
+  .app .top { display: flex; justify-content: space-between; align-items: center; }
+  .app h2 { margin: 0; font: 600 1.15rem var(--display); }
+  .app .pill { font: 500 .7rem var(--mono); padding: 3px 9px; border-radius: 999px; }
+  .msg { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; }
+  .av { width: 36px; height: 36px; border-radius: 50%; flex: none; display: grid; place-items: center; font-weight: 600; font-size: .85rem; }
+  .msg b { display: block; font-size: .92rem; }
+  .msg span { font-size: .8rem; }
+  .cta { margin-top: auto; text-align: center; font-weight: 600; padding: 13px; border-radius: 14px; }
+  .app.l { background: #f5f3f8; color: #17152a; }
+  .app.l .pill { background: #e6e1f2; color: #4a3b78; }
+  .app.l .msg { background: #fff; box-shadow: 0 1px 4px #1b184014; }
+  .app.l .msg span { color: #6b6785; }
+  .app.l .av { background: #ffd9bf; color: #8a3d0b; }
+  .app.l .cta { background: #5b4bd6; color: #fff; }
+  .app.d { background: #0f1018; color: #f1eefb; }
+  .app.d .pill { background: #25243a; color: #c9bdf5; }
+  .app.d .msg { background: #1a1b27; }
+  .app.d .msg span { color: #8f8aa8; }
+  .app.d .av { background: #3b2a5e; color: #e4d6ff; }
+  .app.d .cta { background: #8a78ff; color: #0f1018; }
+
+  .app.l .pill, .app.d .pill { height: auto; padding: 3px 9px; font: 500 .7rem var(--mono); display: inline-block; }
+  .cta { height: auto; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&display=swap">
+
+</head>
+<body>
+<nav>
+  <a href="https://github.com/apreezofficial/twilit">Home</a>
+  <span class="mark">twilit</span>
+  <a href="https://github.com/apreezofficial/twilit#readme">Docs</a>
+</nav>
+
+<section class="hero">
+  <div class="orb">
+    <twilit-compare id="orb" position="50" label="Light and dark preview">
+      <div slot="light" class="face l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div>
+      <div slot="dark" class="face d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
+    </twilit-compare>
+  </div>
+  <h1>Two sides of every screen</h1>
+  <p class="sub">A tiny web component that puts two versions of an interface in one frame and lets people drag between them. No dependencies. Works anywhere.</p>
+  <div class="row">
+    <button class="pill copy" id="copy" type="button" aria-label="Copy install command"><span id="copytext">npm install twilit</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button>
+    <button class="pill go" id="open" type="button">Try it out <kbd>T</kbd></button>
+  </div>
+</section>
+
+<footer>Crafted by <a href="https://github.com/apreezofficial">apreezofficial</a> · MIT · <a href="https://github.com/apreezofficial/twilit">GitHub</a></footer>
+
+<dialog id="dlg" aria-label="Twilit demo">
+  <div class="sheet">
+    <twilit-compare id="hero" position="50" label="Light and dark theme comparison">
+      <div slot="light" class="app l">
+        <div class="top"><h2>Inbox</h2><span class="pill">3 new</span></div>
+        <div class="msg"><div class="av">MK</div><div><b>Mara Keane</b><span>Lunch moved to 1:30</span></div></div>
+        <div class="msg"><div class="av">DJ</div><div><b>Design Jam</b><span>Files ready for review</span></div></div>
+        <div class="msg"><div class="av">OL</div><div><b>Olu Ladipo</b><span>Sent you a link</span></div></div>
+        <div class="cta">New message</div>
+      </div>
+      <div slot="dark" class="app d">
+        <div class="top"><h2>Inbox</h2><span class="pill">3 new</span></div>
+        <div class="msg"><div class="av">MK</div><div><b>Mara Keane</b><span>Lunch moved to 1:30</span></div></div>
+        <div class="msg"><div class="av">DJ</div><div><b>Design Jam</b><span>Files ready for review</span></div></div>
+        <div class="msg"><div class="av">OL</div><div><b>Olu Ladipo</b><span>Sent you a link</span></div></div>
+        <div class="cta">New message</div>
+      </div>
+    </twilit-compare>
+    <div class="bar">
+      <div class="readout">position <b id="pos">50</b>% · change events <b id="count">0</b></div>
+      <div class="btns">
+        <button type="button" class="pill" data-go="0">Dark</button>
+        <button type="button" class="pill" data-go="50">Split</button>
+        <button type="button" class="pill" data-go="100">Light</button>
+        <button type="button" class="pill" id="close">Close <kbd>Esc</kbd></button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script type="module">
+import "./src/twilit.js";
+
+/* page wiring */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const orb = document.getElementById("orb");
+const hero = document.getElementById("hero");
+const dlg = document.getElementById("dlg");
+const posEl = document.getElementById("pos");
+const countEl = document.getElementById("count");
+let count = 0, raf = 0, idle = !reduce, t0 = performance.now();
+
+/* the hero disc drifts on its own until someone touches it */
+orb.addEventListener("pointerdown", () => { idle = false; });
+orb.addEventListener("keydown", () => { idle = false; });
+const drift = (t) => {
+  if (!idle) return;
+  orb.position = 50 + 30 * Math.sin((t - t0) / 1400);
+  requestAnimationFrame(drift);
+};
+if (idle) requestAnimationFrame(drift);
+
+const show = () => { posEl.textContent = Math.round(hero.position); };
+hero.addEventListener("change", () => { count++; countEl.textContent = count; show(); });
+const animateTo = (to, ms = 700) => {
+  cancelAnimationFrame(raf);
+  const from = hero.position, s = performance.now();
+  if (reduce) { hero.position = to; show(); return; }
+  const step = (t) => {
+    const k = Math.min(1, (t - s) / ms), e = 1 - Math.pow(1 - k, 3);
+    hero.position = from + (to - from) * e; show();
+    if (k < 1) raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+};
+document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => animateTo(Number(b.dataset.go))));
+
+const open = () => { if (!dlg.open) dlg.showModal(); };
+document.getElementById("open").addEventListener("click", open);
+document.getElementById("close").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "t" && !e.metaKey && !e.ctrlKey && !e.altKey) open();
+});
+
+const copyBtn = document.getElementById("copy"), copyText = document.getElementById("copytext");
+copyBtn.addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText("npm install twilit"); copyText.textContent = "Copied"; }
+  catch { const r = document.createRange(); r.selectNodeContents(copyText); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); copyText.textContent = "Press Ctrl/Cmd+C"; }
+  setTimeout(() => { copyText.textContent = "npm install twilit"; }, 1600);
+});
+</script>
+</body>
+</html>
